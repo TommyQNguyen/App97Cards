@@ -22,18 +22,13 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     TextView nombreDeCartes, pointage;
-
     ConstraintLayout containerPilesCartes, containerCartesJoueur;
-
     LinearLayout pileCroissante_1, pileCroissante_2, pileDecroissante_1, pileDecroissante_2;
-
     LinearLayout carte1, carte2, carte3, carte4, carte5, carte6, carte7, carte8;
-
-    Intent intent;
     // https://developer.android.com/reference/android/widget/Chronometer.html
     Chronometer chronometre;
-
-    Partie partie = new Partie();
+    Intent intent;
+    Partie partie;
     Ecouteur ec;
 
     @Override
@@ -63,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Etape 1
         ec = new Ecouteur();
+        partie = new Partie();
 
         // Etape 2
         pileCroissante_1.setOnDragListener(ec);
@@ -99,10 +95,9 @@ public class MainActivity extends AppCompatActivity {
     // Etape 3
     private class Ecouteur implements View.OnTouchListener, View.OnDragListener {
 
-        // Parametre view represente la source de l'evenement
         @Override
         public boolean onTouch(View source, MotionEvent event) {
-            // source est la source de l'evenement, c'est le jeton sur lequel on touche
+            // Parametre source est la source de l'evenement, c'est la carte sur laquelle on touche
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(source);
             // Pour permettre de deplacer l'ombre de la carte (carte: 3e parametre, local state)
             source.startDrag(null, shadowBuilder, source, 0);
@@ -125,7 +120,14 @@ public class MainActivity extends AppCompatActivity {
                     // La premiere represente la carte pigee par l'utilisateur
                     // La deuxieme represente celle qui sera ajoute au prochain tour
                     TextView carteJoueurPige = new TextView(MainActivity.this);
+                    carteJoueurPige.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                    carteJoueurPige.setTextColor(Color.WHITE);
+                    carteJoueurPige.setTextSize(40);
+
                     TextView carteJoueurAjoute = new TextView(MainActivity.this);
+                    carteJoueurAjoute.setTextSize(40);
+                    carteJoueurAjoute.setTextColor(Color.WHITE);
+                    carteJoueurAjoute.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
                     // Pour pouvoir entreposer la carte choisie par l'utilisateur
                     // dans la valeur temporaire carteJoueurPige declaree ci-dessus
@@ -140,33 +142,32 @@ public class MainActivity extends AppCompatActivity {
                     TextView cartePileChoisie = (TextView) conteneurPileChoisie.getChildAt(0);
                     String valeurPileChoisie =  cartePileChoisie.getText().toString();
 
-                    //verification de si on place une carte au bon endroit
-                    boolean validationMouvement = false;
+                    // Si l'utilisateur depose la carte pigee sur une pile croissante,
+                    // valider le mouvement de la pile croissante, vice-versa pour decroissante
                     if (conteneurPileChoisie == pileCroissante_1 || conteneurPileChoisie == pileCroissante_2) {
-                        validationMouvement =
-                                partie.validerPileCroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie));
+                        partie.setMouvementLegal(
+                                partie.validerPileCroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie)));
                     }
                     else if (conteneurPileChoisie == pileDecroissante_1 || conteneurPileChoisie == pileDecroissante_2) {
-                        validationMouvement =
-                                partie.validerPileDecroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie));
+                        partie.setMouvementLegal(
+                                partie.validerPileDecroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie)));
                     }
 
-                    // si c'est un mouvement valide, on fait le swap des texts
-                    if (validationMouvement == true) {
-                        conteneurCarteJoueur.removeView(carteJoueurChoisie);    // Enlever la carte de sa colonne d'origine
+                    if (partie.isMouvementLegal() == true) {
+                        // Enlever les carte de leurs piles d'origine
+                        conteneurCarteJoueur.removeView(carteJoueurChoisie);
                         conteneurPileChoisie.removeView(cartePileChoisie);
-                        carteJoueurAjoute.setTextSize(40);
-                        carteJoueurAjoute.setTextColor(Color.WHITE);
-                        carteJoueurAjoute.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+                        // Retirer une carte de la liste de cartes pour remplacer
+                        // celle qui a ete pigee par l'utilisateur
                         carteJoueurAjoute.setText(Integer.toString(partie.getListeDeCartes().get(0)));
                         partie.getListeDeCartes().remove(0);
-
-                        carteJoueurPige.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                        carteJoueurPige.setTextColor(Color.WHITE);
-                        carteJoueurPige.setTextSize(40);
-                        // Ajouter la carte sur sa colonne de destination
-                        conteneurPileChoisie.addView(carteJoueurPige);
                         conteneurCarteJoueur.addView(carteJoueurAjoute);
+
+                        // Ajouter la carte pigee sur la pile choisie
+                        // par l'utilisateur
+                        conteneurPileChoisie.addView(carteJoueurPige);
+
 
                         //arret du chrono pour savoir le temps et quel score donner
 //                        chronometre.stop();
@@ -193,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
                     nombreDeCartes.setText(String.valueOf(partie.getNombreDeCartes()));
 
                     partie.viderListesDeCartes();
-
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte1);
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte2);
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte3);
@@ -202,21 +202,17 @@ public class MainActivity extends AppCompatActivity {
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte6);
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte7);
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte8);
-
                     partie.extraireValeurPileCroissante(MainActivity.this, pileCroissante_1);
                     partie.extraireValeurPileCroissante(MainActivity.this, pileCroissante_1);
-
                     partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_1);
                     partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_2);
 
                     partie.setFinDeLaPartie(partie.validerMouvementPossible());
-
                     if (partie.isFinDeLaPartie() == true) {
                         intent = new Intent(MainActivity.this, Conclusion.class);
                         intent.putExtra("points", Integer.toString(partie.getNombreDePoints()));
                         startActivity(intent);
                     }
-
                     break;
 
                 case DragEvent.ACTION_DRAG_ENDED:

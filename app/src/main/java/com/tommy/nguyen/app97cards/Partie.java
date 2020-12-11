@@ -11,7 +11,7 @@ import java.util.List;
 public class Partie {
 
     int nombreDeCartes = 97, nombreDePoints = 0;
-    boolean finDeLaPartie = false;
+    boolean mouvementLegal = false, finDeLaPartie = false;
     List<Integer> listeDeCartes, listeCartesJoueur, listeCartesCroissantes, listeCartesDecroissantes;
 
     public Partie() {
@@ -60,12 +60,16 @@ public class Partie {
         }
     }
 
+    // Vide les listes de cartes pour analyser
+    // l'etat de la partie.
     public void viderListesDeCartes() {
         listeCartesJoueur.clear();
         listeCartesCroissantes.clear();
         listeCartesDecroissantes.clear();
     }
 
+    // Extraction des valeurs de leurs conteneurs pour ensuite
+    // les analyser.
     public void extraireValeurCarteJoueur (Context context, LinearLayout carte) {
         TextView textView = new TextView(context);
         textView = (TextView) carte.getChildAt(0);
@@ -87,37 +91,31 @@ public class Partie {
         listeCartesDecroissantes.add(Integer.parseInt(valeurCarte));
     }
 
+    // Analyser les cartes du joueur pour voir si un autre mouvement est possible.
+    // Retourne faux ce n'est pas impossible de faire un autre mouvement.
     public boolean validerMouvementPossible() {
-        boolean mouvementPossiblePileCroissante = false;
-        boolean mouvementPossiblePileDecroissante = false;
+        boolean mouvementPossiblePileCroissante = false, mouvementPossiblePileDecroissante = false;
         for (int i = 0; i < listeCartesJoueur.size(); i++) {
             for (int j = 0; j < listeCartesCroissantes.size(); j++)
             {
                 boolean plusGrandQuePile = listeCartesJoueur.get(i) > listeCartesCroissantes.get(j);
-                // a SURVEILLER
+                boolean plusPetitQuePile = listeCartesJoueur.get(i) < listeCartesDecroissantes.get(j);
                 boolean valeurPlusPetitDe10 = listeCartesJoueur.get(i) == listeCartesJoueur.get(i) - 10;
+                boolean valeurPlusGrandDe10 = listeCartesJoueur.get(i) == listeCartesJoueur.get(i) + 10;
                 if (plusGrandQuePile || valeurPlusPetitDe10) {
                     mouvementPossiblePileCroissante = true;
                 }
-            }
-        }
-        for (int i = 0; i < listeCartesJoueur.size(); i++) {
-            for (int j = 0; j < listeCartesDecroissantes.size(); j++)
-            {
-                boolean plusPetitQuePile = listeCartesJoueur.get(i) < listeCartesDecroissantes.get(j);
-                // a SURVEILLER AUSSI
-                boolean valeurPlusGrandDe10 = listeCartesJoueur.get(i) == listeCartesJoueur.get(i) + 10;
                 if (plusPetitQuePile || valeurPlusGrandDe10) {
                     mouvementPossiblePileDecroissante = true;
                 }
             }
         }
-
         if (mouvementPossiblePileCroissante == true || mouvementPossiblePileDecroissante == true) {
             return false;
         }
-        return true;
-
+        else {
+            return true;
+        }
     }
 
     public int getNombreDeCartes() {
@@ -138,6 +136,14 @@ public class Partie {
 
     public List<Integer> getListeCartesJoueur() {
         return listeCartesJoueur;
+    }
+
+    public boolean isMouvementLegal() {
+        return mouvementLegal;
+    }
+
+    public void setMouvementLegal(boolean mouvementLegal) {
+        this.mouvementLegal = mouvementLegal;
     }
 
     public void setNombreDePoints(int nombreDePoints) {
