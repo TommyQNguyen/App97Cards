@@ -10,9 +10,10 @@ import java.util.List;
 
 public class Partie {
 
-    int nombreDeCartes = 97, nombreDePoints = 0;
-    boolean mouvementLegal = false, finDeLaPartie = false;
-    List<Integer> listeDeCartes, listeCartesJoueur, listeCartesCroissantes, listeCartesDecroissantes;
+    private final int BASE_POINTS = 100;
+    private int nombreDeCartes = 97, nombreDePoints = 0;
+    private boolean mouvementLegal = false, finDeLaPartie = false;
+    private List<Integer> listeDeCartes, listeCartesJoueur, listeCartesCroissantes, listeCartesDecroissantes;
 
     public Partie() {
         listeDeCartes = new ArrayList<>();
@@ -32,7 +33,7 @@ public class Partie {
         ((TextView) carte.getChildAt(0)).setText(Integer.toString(listeDeCartes.remove(0)));
     }
 
-    // Verifie si le joueur peut placer sa carte sur une des piles croissantes
+    // Valider si le joueur peut placer sa carte sur une des piles croissantes
     public boolean validerPileCroissante(int carteSelectionne, int carteSurLaPile) {
         boolean plusGrandQuePile = carteSelectionne > carteSurLaPile;
         boolean moinsDe10 = carteSelectionne == carteSurLaPile - 10;
@@ -116,6 +117,27 @@ public class Partie {
         else {
             return true;
         }
+    }
+
+    public void calculerPoints (int millisecondesEcoulees, int pointsProximite) {
+        int pointsCartesRestantes = BASE_POINTS - nombreDeCartes;
+
+        if (millisecondesEcoulees > 10000)
+            nombreDePoints = nombreDePoints + 10;
+        else if (millisecondesEcoulees > 8000)
+            nombreDePoints = nombreDePoints + 20;
+        else if (millisecondesEcoulees > 6000)
+            nombreDePoints = nombreDePoints + 40;
+        else if (millisecondesEcoulees > 4000)
+            nombreDePoints = nombreDePoints + 60;
+        else if (millisecondesEcoulees > 2000)
+            nombreDePoints = nombreDePoints + 80;
+
+        nombreDePoints = nombreDePoints + pointsProximite + pointsCartesRestantes;
+    }
+
+    public int getBASE_POINTS() {
+        return BASE_POINTS;
     }
 
     public int getNombreDeCartes() {

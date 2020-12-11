@@ -21,6 +21,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    int pointsProximite = 0;
     TextView nombreDeCartes, pointage;
     ConstraintLayout containerPilesCartes, containerCartesJoueur;
     LinearLayout pileCroissante_1, pileCroissante_2, pileDecroissante_1, pileDecroissante_2;
@@ -46,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         pileCroissante_2 = findViewById(R.id.pileCroissante_2);
         pileDecroissante_1 = findViewById(R.id.pileDecroissante_1);
         pileDecroissante_2 = findViewById(R.id.pileDecroissante_2);
-
         carte1 = findViewById(R.id.carte1);
         carte2 = findViewById(R.id.carte2);
         carte3 = findViewById(R.id.carte3);
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         carte8.setOnTouchListener(ec);
         carte8.setOnDragListener(ec);
 
+        // Distribuer les cartes a l'utilisateur
         partie.placerCarteAleatoire(carte1);
         partie.placerCarteAleatoire(carte2);
         partie.placerCarteAleatoire(carte3);
@@ -147,10 +148,12 @@ public class MainActivity extends AppCompatActivity {
                     if (conteneurPileChoisie == pileCroissante_1 || conteneurPileChoisie == pileCroissante_2) {
                         partie.setMouvementLegal(
                                 partie.validerPileCroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie)));
+                        pointsProximite = partie.getBASE_POINTS() - (Integer.parseInt(valeurCartePige) - Integer.parseInt(valeurPileChoisie));
                     }
                     else if (conteneurPileChoisie == pileDecroissante_1 || conteneurPileChoisie == pileDecroissante_2) {
                         partie.setMouvementLegal(
                                 partie.validerPileDecroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie)));
+                        pointsProximite = partie.getBASE_POINTS() - (Integer.parseInt(valeurPileChoisie) - Integer.parseInt(valeurCartePige));
                     }
 
                     if (partie.isMouvementLegal() == true) {
@@ -168,26 +171,18 @@ public class MainActivity extends AppCompatActivity {
                         // par l'utilisateur
                         conteneurPileChoisie.addView(carteJoueurPige);
 
-
-                        //arret du chrono pour savoir le temps et quel score donner
-//                        chronometre.stop();
-
-
-                        System.out.println(partie.getListeDeCartes());
-//                        System.out.println("Nombre de cartes: " + (partie.getListeDeCartes().size() + listeCartesJoueur.size()));
-
-                        // Algorithme de distribution de points
-                        int calculPointage = (int) (SystemClock.elapsedRealtime() - chronometre.getBase());
-//                        chronometre.setBase(SystemClock.elapsedRealtime());
+                        // Ici, on arrete temporairement le temps pour
+                        // recueillir les millisecondes annulees
+                        chronometre.stop();
+                        int millisecondesEcoulees = (int) (SystemClock.elapsedRealtime() - chronometre.getBase());
+                        chronometre.setBase(SystemClock.elapsedRealtime());
                         chronometre.start();
-//                        System.out.println("SystemClock.elapsedRealtime(): " + SystemClock.elapsedRealtime());
-//                        System.out.println("chronometre.getBase(): " + chronometre.getBase());
-                        if (calculPointage > 10000)
-                            partie.setNombreDePoints(partie.getNombreDePoints() + 1);
-                        else if (calculPointage > 5000)
-                            partie.setNombreDePoints(partie.getNombreDePoints() + 5);
-                        else if (calculPointage > 1000)
-                            partie.setNombreDePoints(partie.getNombreDePoints() + 10);
+
+                        System.out.println("SystemClock.elapsedRealtime(): " + SystemClock.elapsedRealtime());
+                        System.out.println("chronometre.getBase(): " + chronometre.getBase());
+
+                        partie.calculerPoints(millisecondesEcoulees, pointsProximite);
+
                         // Affichage du nouveau pointage
                         pointage.setText(String.valueOf(partie.getNombreDePoints()));
                     }
@@ -223,6 +218,4 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     } // Fin de la classe Ecouteur
-
-
 }
