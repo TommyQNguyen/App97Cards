@@ -11,101 +11,143 @@ import java.util.List;
 public class Partie {
 
     int nombreDeCartes = 97;
-    List<Integer> listeDeCartes = new ArrayList<>();
+    boolean finDeLaPartie = false;
+    List<Integer> listeDeCartes;
 
-    public Partie() {}
-
-    // Initialise les cartes au debut
-    public List<Integer> initialiserListeCartes (List<Integer> listeDeCartes) {
-        for (int i = 1; i <= nombreDeCartes; i++) {
-            listeDeCartes.add(i);
-        }
-        return listeDeCartes;
+    public boolean isFinDeLaPartie() {
+        return finDeLaPartie;
     }
 
-    // Melanger l'order des cartes dans la liste
-    public List<Integer> melangerListeCartes(List<Integer> listeDeCartes) {
+    public void setFinDeLaPartie(boolean finDeLaPartie) {
+        this.finDeLaPartie = finDeLaPartie;
+    }
+
+    List<Integer> listeCartesJoueur, listeCartesCroissantes, listeCartesDecroissantes;
+
+    public Partie() {
+        listeDeCartes = new ArrayList<>();
+        listeCartesJoueur = new ArrayList<>();
+        listeCartesCroissantes = new ArrayList<>();
+        listeCartesDecroissantes = new ArrayList<>();
+
+        for (int i = 1; i <= nombreDeCartes; i++)
+            listeDeCartes.add(i);
+
         // https://docs.oracle.com/javase/6/docs/api/java/util/Collections.html
         Collections.shuffle(listeDeCartes);
-        return listeDeCartes;
     }
 
-    public void placerCarteAleatoire(List<Integer> listeDeCartes, LinearLayout carte) {
-        Partie partie = new Partie();
-        listeDeCartes = partie.melangerListeCartes(listeDeCartes);
-        int valeurCarteAleatoire = listeDeCartes.remove(0);
-        ((TextView) carte.getChildAt(0)).setText(Integer.toString(valeurCarteAleatoire));
+    // Au debut du jeu, placer une carte au hasard pour le joueur
+    public void placerCarteAleatoire(LinearLayout carte) {
+        ((TextView) carte.getChildAt(0)).setText(Integer.toString(listeDeCartes.remove(0)));
     }
 
-    // Verifie si on peut placer une carte sur une pile croissante
+    // Verifie si le joueur peut placer sa carte sur une des piles croissantes
     public boolean validerPileCroissante(int carteSelectionne, int carteSurLaPile) {
-        if(carteSelectionne > carteSurLaPile)
+        boolean plusGrandQuePile = carteSelectionne > carteSurLaPile;
+        boolean moinsDe10 = carteSelectionne == carteSurLaPile - 10;
+        if (plusGrandQuePile || moinsDe10) {
+            listeDeCartes.remove(Integer.valueOf(carteSelectionne));
+            nombreDeCartes = nombreDeCartes - 1;
             return true;
-        else if (carteSelectionne == carteSurLaPile - 10)
-            return true;
-        else
+        }
+        else {
             return false;
+        }
     }
 
-    // Verifie si on peut placer une carte sur une pile decroissante
+    // Verifie si le joueur peut placer sa carte sur une des piles decroissantes
     public boolean validerPileDecroissante(int carteSelectionne, int carteSurLaPile) {
-        if (carteSelectionne < carteSurLaPile)
+        boolean plusPetitQuePile = carteSelectionne < carteSurLaPile;
+        boolean plusDe10 = carteSelectionne == carteSurLaPile + 10;
+        if (plusPetitQuePile || plusDe10) {
+            listeDeCartes.remove(Integer.valueOf(carteSelectionne));
+            nombreDeCartes = nombreDeCartes - 1;
             return true;
-        else if (carteSelectionne == carteSurLaPile + 10)
-            return true;
-        else
+        }
+        else {
             return false;
+        }
     }
 
-    public void regrouperValeurCartes (Context context, LinearLayout carte, List<Integer> listeCartes) {
+    public void viderListesDeCartes() {
+        listeCartesJoueur.clear();
+        listeCartesCroissantes.clear();
+        listeCartesDecroissantes.clear();
+    }
+
+    public void extraireValeurCarteJoueur (Context context, LinearLayout carte) {
         TextView textView = new TextView(context);
         textView = (TextView) carte.getChildAt(0);
         String valeurCarte = textView.getText().toString();
-        listeCartes.add(Integer.parseInt(valeurCarte));
+        listeCartesJoueur.add(Integer.parseInt(valeurCarte));
     }
 
-    //pour verifier la condition d'arret de jeu, on verifie toute les cartes en main et tout les carte su le board
-    public boolean verifCondArret(List<Integer> listeCartesJoueur, List<Integer> listeCartesCroissantes,List<Integer> listeCartesDecroissantes) {
-        boolean firstHalf = false;
-        boolean secondHalf = false;
+    public void extraireValeurPileCroissante (Context context, LinearLayout carte) {
+        TextView textView = new TextView(context);
+        textView = (TextView) carte.getChildAt(0);
+        String valeurCarte = textView.getText().toString();
+        listeCartesCroissantes.add(Integer.parseInt(valeurCarte));
+    }
+
+    public void extraireValeurPileDecroissante (Context context, LinearLayout carte) {
+        TextView textView = new TextView(context);
+        textView = (TextView) carte.getChildAt(0);
+        String valeurCarte = textView.getText().toString();
+        listeCartesDecroissantes.add(Integer.parseInt(valeurCarte));
+    }
+
+    public boolean validerMouvementPossible() {
+        boolean mouvementPossiblePileCroissante = false;
+        boolean mouvementPossiblePileDecroissante = false;
         for (int i = 0; i < listeCartesJoueur.size(); i++) {
             for (int j = 0; j < listeCartesCroissantes.size(); j++)
             {
-                if (listeCartesJoueur.get(i) > listeCartesCroissantes.get(j)) {
-                    firstHalf = true;
+                boolean plusGrandQuePile = listeCartesJoueur.get(i) > listeCartesCroissantes.get(j);
+                // a SURVEILLER
+                boolean valeurPlusPetitDe10 = listeCartesJoueur.get(i) == listeCartesJoueur.get(i) - 10;
+                if (plusGrandQuePile || valeurPlusPetitDe10) {
+                    mouvementPossiblePileCroissante = true;
                 }
-//                else {
-//                    firstHalf = false;
-//                }
-                System.out.println("firstHalf : " + firstHalf + " i: " + i + " j: " + j);
             }
         }
         for (int i = 0; i < listeCartesJoueur.size(); i++) {
             for (int j = 0; j < listeCartesDecroissantes.size(); j++)
             {
-                if (listeCartesJoueur.get(i) < listeCartesDecroissantes.get(j)) {
-                    secondHalf = true;
+                boolean plusPetitQuePile = listeCartesJoueur.get(i) < listeCartesDecroissantes.get(j);
+                // a SURVEILLER AUSSI
+                boolean valeurPlusGrandDe10 = listeCartesJoueur.get(i) == listeCartesJoueur.get(i) + 10;
+                if (plusPetitQuePile || valeurPlusGrandDe10) {
+                    mouvementPossiblePileDecroissante = true;
                 }
-//                else
-//                    secondHalf = false;
-                System.out.println("secondHalf : " + secondHalf + " i: " + i + " j: " + j);
             }
         }
-        System.out.println("firstHalf: " + firstHalf);
-        System.out.println("secondHalf: " + secondHalf);
-        System.out.println("firstHalf == true && secondHalf == true : " + (firstHalf == true && secondHalf == true));
-        if (firstHalf == true || secondHalf == true) {
-            System.out.println("verifCondArret returned: FALSE");
-            return false;
 
+        if (mouvementPossiblePileCroissante == true || mouvementPossiblePileDecroissante == true) {
+            return false;
         }
-        System.out.println("verifCondArret returned: TRUE");
         return true;
 
     }
 
+    public int getNombreDeCartes() {
+        return nombreDeCartes;
+    }
+
     public List<Integer> getListeDeCartes() {
         return listeDeCartes;
+    }
+
+    public List<Integer> getListeCartesCroissantes() {
+        return listeCartesCroissantes;
+    }
+
+    public List<Integer> getListeCartesDecroissantes() {
+        return listeCartesDecroissantes;
+    }
+
+    public List<Integer> getListeCartesJoueur() {
+        return listeCartesJoueur;
     }
 
 }

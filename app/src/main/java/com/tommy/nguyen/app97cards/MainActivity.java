@@ -21,50 +21,35 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView pointage;
+    TextView nombreDeCartes, pointage;
 
-    ConstraintLayout containerPilesCartes;
-    ConstraintLayout containerCartesJoueur;
+    ConstraintLayout containerPilesCartes, containerCartesJoueur;
 
-    LinearLayout pileCroissante_1;
-    LinearLayout pileCroissante_2;
-    LinearLayout pileDecroissante_1;
-    LinearLayout pileDecroissante_2;
+    LinearLayout pileCroissante_1, pileCroissante_2, pileDecroissante_1, pileDecroissante_2;
 
-    LinearLayout carte1;
-    LinearLayout carte2;
-    LinearLayout carte3;
-    LinearLayout carte4;
-    LinearLayout carte5;
-    LinearLayout carte6;
-    LinearLayout carte7;
-    LinearLayout carte8;
+    LinearLayout carte1, carte2, carte3, carte4, carte5, carte6, carte7, carte8;
 
     Intent intent;
     // https://developer.android.com/reference/android/widget/Chronometer.html
     Chronometer chronometre;
     int points;
 
-    List<Integer> listeCartesJoueur = new ArrayList<Integer>();
-    List<Integer> listeCartesCroissant = new ArrayList<Integer>();
-    List<Integer> listeCartesDecroissant = new ArrayList<Integer>();
+//    List<Integer> listeCartesCroissant, listeCartesDecroissant;
 
     Partie partie = new Partie();
     Ecouteur ec;
-
-    List<Integer> listeDeCartes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Recuperer les composantes
         containerPilesCartes = findViewById(R.id.containerPilesCartes);
         containerCartesJoueur = findViewById(R.id.containerCartesJoueur);
-
+        nombreDeCartes = findViewById(R.id.nombreDeCartes);
         chronometre = findViewById(R.id.chronometre);
         pointage = findViewById(R.id.pointage);
-
         pileCroissante_1 = findViewById(R.id.pileCroissante_1);
         pileCroissante_2 = findViewById(R.id.pileCroissante_2);
         pileDecroissante_1 = findViewById(R.id.pileDecroissante_1);
@@ -79,19 +64,16 @@ public class MainActivity extends AppCompatActivity {
         carte7 = findViewById(R.id.carte7);
         carte8 = findViewById(R.id.carte8);
 
-
-//        intent = new Intent(MainActivity.this, Conclusion.class);
         points = 0;
 
-        listeDeCartes = partie.initialiserListeCartes(listeDeCartes);
+        // Etape 1
         ec = new Ecouteur();
 
-        // pour ajouter les ecouteurs au linear layouts et pour set les texts de debut de la partie superieur
+        // Etape 2
         pileCroissante_1.setOnDragListener(ec);
         pileCroissante_2.setOnDragListener(ec);
         pileDecroissante_1.setOnDragListener(ec);
         pileDecroissante_2.setOnDragListener(ec);
-
         carte1.setOnTouchListener(ec);
         carte1.setOnDragListener(ec);
         carte2.setOnTouchListener(ec);
@@ -109,91 +91,101 @@ public class MainActivity extends AppCompatActivity {
         carte8.setOnTouchListener(ec);
         carte8.setOnDragListener(ec);
 
-//        listeDeCartes = partie.melangerListeCartes(listeDeCartes);
-//        int valeurCarteAleatoire = listeDeCartes.remove(0);
-//        ((TextView) carte1.getChildAt(0)).setText(Integer.toString(valeurCarteAleatoire));
-        partie.placerCarteAleatoire(listeDeCartes, carte1);
-        partie.placerCarteAleatoire(listeDeCartes, carte2);
-        partie.placerCarteAleatoire(listeDeCartes, carte3);
-        partie.placerCarteAleatoire(listeDeCartes, carte4);
-        partie.placerCarteAleatoire(listeDeCartes, carte5);
-        partie.placerCarteAleatoire(listeDeCartes, carte6);
-        partie.placerCarteAleatoire(listeDeCartes, carte7);
-        partie.placerCarteAleatoire(listeDeCartes, carte8);
+        partie.placerCarteAleatoire(carte1);
+        partie.placerCarteAleatoire(carte2);
+        partie.placerCarteAleatoire(carte3);
+        partie.placerCarteAleatoire(carte4);
+        partie.placerCarteAleatoire(carte5);
+        partie.placerCarteAleatoire(carte6);
+        partie.placerCarteAleatoire(carte7);
+        partie.placerCarteAleatoire(carte8);
     }
 
+    // Etape 3
     private class Ecouteur implements View.OnTouchListener, View.OnDragListener {
 
+        // Parametre view represente la source de l'evenement
         @Override
         public boolean onTouch(View source, MotionEvent event) {
-
+            // source est la source de l'evenement, c'est le jeton sur lequel on touche
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(source);
+            // Pour permettre de deplacer l'ombre de la carte (carte: 3e parametre, local state)
             source.startDrag(null, shadowBuilder, source, 0);
             return true;
         }
 
         @Override
         public boolean onDrag(View source, DragEvent event) {
-
             switch (event.getAction()) {
-
                 case DragEvent.ACTION_DRAG_ENTERED:
                     break;
-
                 case DragEvent.ACTION_DRAG_EXITED:
                     break;
-
                 case DragEvent.ACTION_DROP:
+                    // Pour mettre en contexte:
+                    // Suggestion d'Eric que chaque pile aie son propre conteneur mais
+                    // qu'egalement chaque carte du jeu (8) aie egalement son conteneur.
 
-                    //deux textviews placeholders pour les textviews quon va devoir modifier
-                    TextView ancien = new TextView(MainActivity.this);
-                    TextView nouveau = new TextView(MainActivity.this);
-                    String selectedValue;
-                    String boardValue;
-                    // basic swapping pour sauvegarde des données avant de les changers
-                    LinearLayout maCarte = (LinearLayout) event.getLocalState();
-                    TextView textSelectioner = (TextView) maCarte.getChildAt(0);
-                    ancien.setText(textSelectioner.getText());
-                    // Recuperer la colonne de destination
-                    LinearLayout destination = (LinearLayout) source;
-                    TextView textDrop = (TextView)destination.getChildAt(0);
-                    selectedValue = ancien.getText().toString();
-                    boardValue =  textDrop.getText().toString();
+                    // Deux valeurs temporaires pour garder l'information des cartes jouees
+                    // La premiere represente la carte pigee par l'utilisateur
+                    // La deuxieme represente celle qui sera ajoute au prochain tour
+                    TextView carteJoueurPige = new TextView(MainActivity.this);
+                    TextView carteJoueurAjoute = new TextView(MainActivity.this);
+
+                    // Pour pouvoir entreposer la carte choisie par l'utilisateur
+                    // dans la valeur temporaire carteJoueurPige declaree ci-dessus
+                    LinearLayout conteneurCarteJoueur = (LinearLayout) event.getLocalState();
+                    TextView carteJoueurChoisie = (TextView) conteneurCarteJoueur.getChildAt(0);
+                    carteJoueurPige.setText(carteJoueurChoisie.getText());
+                    String valeurCartePige = carteJoueurPige.getText().toString();
+
+                    // Pour pouvoir identifier la pile sur laquelle le joueur depose
+                    // sa carte et extraire la valeur sur la pile pendant le meme tour
+                    LinearLayout conteneurPileChoisie = (LinearLayout) source;
+                    TextView cartePileChoisie = (TextView) conteneurPileChoisie.getChildAt(0);
+                    String valeurPileChoisie =  cartePileChoisie.getText().toString();
 
                     //verification de si on place une carte au bon endroit
                     boolean validationMouvement = false;
-                    if (destination == pileCroissante_1 || destination == pileCroissante_2) {
+                    if (conteneurPileChoisie == pileCroissante_1 || conteneurPileChoisie == pileCroissante_2) {
                         validationMouvement =
-                                partie.validerPileCroissante(Integer.parseInt(selectedValue), Integer.parseInt(boardValue));
+                                partie.validerPileCroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie));
                     }
-                    if (destination == pileDecroissante_1 || destination == pileDecroissante_2) {
+                    else if (conteneurPileChoisie == pileDecroissante_1 || conteneurPileChoisie == pileDecroissante_2) {
                         validationMouvement =
-                                partie.validerPileDecroissante(Integer.parseInt(selectedValue), Integer.parseInt(boardValue));
+                                partie.validerPileDecroissante(Integer.parseInt(valeurCartePige), Integer.parseInt(valeurPileChoisie));
                     }
 
                     // si c'est un mouvement valide, on fait le swap des texts
                     if (validationMouvement == true) {
-                        maCarte.removeView(textSelectioner);    // Enlever la carte de sa colonne d'origine
-                        destination.removeView(textDrop);
-                        partie.melangerListeCartes(listeDeCartes);
-                        nouveau.setTextSize(36);
-                        nouveau.setTextColor(Color.WHITE);
-                        nouveau.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                        nouveau.setText(Integer.toString(listeDeCartes.get(0)));
+                        conteneurCarteJoueur.removeView(carteJoueurChoisie);    // Enlever la carte de sa colonne d'origine
+                        conteneurPileChoisie.removeView(cartePileChoisie);
+                        carteJoueurAjoute.setTextSize(40);
+                        carteJoueurAjoute.setTextColor(Color.WHITE);
+                        carteJoueurAjoute.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                        carteJoueurAjoute.setText(Integer.toString(partie.getListeDeCartes().get(0)));
+                        partie.getListeDeCartes().remove(0);
 
-                        ancien.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                        ancien.setTextColor(Color.WHITE);
-                        ancien.setTextSize(36);
+                        carteJoueurPige.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                        carteJoueurPige.setTextColor(Color.WHITE);
+                        carteJoueurPige.setTextSize(40);
                         // Ajouter la carte sur sa colonne de destination
-                        destination.addView(ancien);
-                        maCarte.addView(nouveau);
+                        conteneurPileChoisie.addView(carteJoueurPige);
+                        conteneurCarteJoueur.addView(carteJoueurAjoute);
+
                         //arret du chrono pour savoir le temps et quel score donner
-                        chronometre.stop();
+//                        chronometre.stop();
+
+                        nombreDeCartes.setText(String.valueOf(partie.getNombreDeCartes()));
+                        System.out.println(partie.getListeDeCartes());
+//                        System.out.println("Nombre de cartes: " + (partie.getListeDeCartes().size() + listeCartesJoueur.size()));
 
                         // Algorithme de distribution de points
                         int calculPointage = (int) (SystemClock.elapsedRealtime() - chronometre.getBase());
-                        chronometre.setBase(SystemClock.elapsedRealtime());
+//                        chronometre.setBase(SystemClock.elapsedRealtime());
                         chronometre.start();
+//                        System.out.println("SystemClock.elapsedRealtime(): " + SystemClock.elapsedRealtime());
+//                        System.out.println("chronometre.getBase(): " + chronometre.getBase());
                         if (calculPointage > 10000)
                             points = points + 1;
                         else if (calculPointage > 5000)
@@ -205,37 +197,32 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     // trois liste qu'on verifie a chaque tours pour voir si c la fin de partie
-                    listeCartesJoueur.removeAll(listeCartesJoueur);
+                    partie.viderListesDeCartes();
 
-                    partie.regrouperValeurCartes(MainActivity.this, carte1, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte2, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte3, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte4, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte5, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte6, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte7, listeCartesJoueur);
-                    partie.regrouperValeurCartes(MainActivity.this, carte8, listeCartesJoueur);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte1);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte2);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte3);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte4);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte5);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte6);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte7);
+                    partie.extraireValeurCarteJoueur(MainActivity.this, carte8);
 
-                    listeCartesCroissant.removeAll(listeCartesCroissant);
+                    partie.extraireValeurPileCroissante(MainActivity.this, pileCroissante_1);
+                    partie.extraireValeurPileCroissante(MainActivity.this, pileCroissante_1);
 
-                    partie.regrouperValeurCartes(MainActivity.this, pileCroissante_1, listeCartesCroissant);
-                    partie.regrouperValeurCartes(MainActivity.this, pileCroissante_2, listeCartesCroissant);
+                    partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_1);
+                    partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_2);
 
-                    listeCartesDecroissant.removeAll(listeCartesDecroissant);
-
-                    partie.regrouperValeurCartes(MainActivity.this, pileDecroissante_1, listeCartesDecroissant);
-                    partie.regrouperValeurCartes(MainActivity.this, pileDecroissante_2, listeCartesDecroissant);
-                    System.out.println(listeCartesJoueur);
-                    System.out.println(listeCartesCroissant);
-                    System.out.println(listeCartesDecroissant);
                     // c'est la fin de la partie si on ne peut plus rien jouer (verification des trois liste)
-                    boolean finPartie = partie.verifCondArret(listeCartesJoueur, listeCartesCroissant, listeCartesDecroissant);
-                    if(finPartie == true) {
+                    partie.setFinDeLaPartie(partie.validerMouvementPossible());
+
+                    if(partie.isFinDeLaPartie() == true) {
                         intent = new Intent(MainActivity.this, Conclusion.class);
                         intent.putExtra("points", Integer.toString(points));
                         startActivity(intent);
                     }
-                    if (listeDeCartes.isEmpty()) {
+                    if (partie.getNombreDeCartes() == 0) {
                         intent.putExtra("points", points);
                         startActivity(intent);
                     }
@@ -244,15 +231,11 @@ public class MainActivity extends AppCompatActivity {
 
                 case DragEvent.ACTION_DRAG_ENDED:
                     break;
-
                 default:
                     break;
             }
             return true;
         }
-
-
-
     } // Fin de la classe Ecouteur
 
 
