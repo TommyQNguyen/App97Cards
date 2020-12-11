@@ -10,19 +10,9 @@ import java.util.List;
 
 public class Partie {
 
-    int nombreDeCartes = 97;
+    int nombreDeCartes = 97, nombreDePoints = 0;
     boolean finDeLaPartie = false;
-    List<Integer> listeDeCartes;
-
-    public boolean isFinDeLaPartie() {
-        return finDeLaPartie;
-    }
-
-    public void setFinDeLaPartie(boolean finDeLaPartie) {
-        this.finDeLaPartie = finDeLaPartie;
-    }
-
-    List<Integer> listeCartesJoueur, listeCartesCroissantes, listeCartesDecroissantes;
+    List<Integer> listeDeCartes, listeCartesJoueur, listeCartesCroissantes, listeCartesDecroissantes;
 
     public Partie() {
         listeDeCartes = new ArrayList<>();
@@ -150,4 +140,19 @@ public class Partie {
         return listeCartesJoueur;
     }
 
+    public void setNombreDePoints(int nombreDePoints) {
+        this.nombreDePoints = nombreDePoints;
+    }
+
+    public int getNombreDePoints() {
+        return nombreDePoints;
+    }
+
+    public void setFinDeLaPartie(boolean finDeLaPartie) {
+        this.finDeLaPartie = finDeLaPartie;
+    }
+
+    public boolean isFinDeLaPartie() {
+        return finDeLaPartie || nombreDeCartes == 0;
+    }
 }

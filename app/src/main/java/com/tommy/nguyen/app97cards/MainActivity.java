@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity {
     Intent intent;
     // https://developer.android.com/reference/android/widget/Chronometer.html
     Chronometer chronometre;
-    int points;
-
-//    List<Integer> listeCartesCroissant, listeCartesDecroissant;
 
     Partie partie = new Partie();
     Ecouteur ec;
@@ -63,8 +60,6 @@ public class MainActivity extends AppCompatActivity {
         carte6 = findViewById(R.id.carte6);
         carte7 = findViewById(R.id.carte7);
         carte8 = findViewById(R.id.carte8);
-
-        points = 0;
 
         // Etape 1
         ec = new Ecouteur();
@@ -176,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                         //arret du chrono pour savoir le temps et quel score donner
 //                        chronometre.stop();
 
-                        nombreDeCartes.setText(String.valueOf(partie.getNombreDeCartes()));
+
                         System.out.println(partie.getListeDeCartes());
 //                        System.out.println("Nombre de cartes: " + (partie.getListeDeCartes().size() + listeCartesJoueur.size()));
 
@@ -187,16 +182,16 @@ public class MainActivity extends AppCompatActivity {
 //                        System.out.println("SystemClock.elapsedRealtime(): " + SystemClock.elapsedRealtime());
 //                        System.out.println("chronometre.getBase(): " + chronometre.getBase());
                         if (calculPointage > 10000)
-                            points = points + 1;
+                            partie.setNombreDePoints(partie.getNombreDePoints() + 1);
                         else if (calculPointage > 5000)
-                            points = points + 5;
+                            partie.setNombreDePoints(partie.getNombreDePoints() + 5);
                         else if (calculPointage > 1000)
-                            points = points + 10;
+                            partie.setNombreDePoints(partie.getNombreDePoints() + 10);
                         // Affichage du nouveau pointage
-                        pointage.setText(String.valueOf(points));
+                        pointage.setText(String.valueOf(partie.getNombreDePoints()));
                     }
+                    nombreDeCartes.setText(String.valueOf(partie.getNombreDeCartes()));
 
-                    // trois liste qu'on verifie a chaque tours pour voir si c la fin de partie
                     partie.viderListesDeCartes();
 
                     partie.extraireValeurCarteJoueur(MainActivity.this, carte1);
@@ -214,16 +209,11 @@ public class MainActivity extends AppCompatActivity {
                     partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_1);
                     partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_2);
 
-                    // c'est la fin de la partie si on ne peut plus rien jouer (verification des trois liste)
                     partie.setFinDeLaPartie(partie.validerMouvementPossible());
 
-                    if(partie.isFinDeLaPartie() == true) {
+                    if (partie.isFinDeLaPartie() == true) {
                         intent = new Intent(MainActivity.this, Conclusion.class);
-                        intent.putExtra("points", Integer.toString(points));
-                        startActivity(intent);
-                    }
-                    if (partie.getNombreDeCartes() == 0) {
-                        intent.putExtra("points", points);
+                        intent.putExtra("points", Integer.toString(partie.getNombreDePoints()));
                         startActivity(intent);
                     }
 
