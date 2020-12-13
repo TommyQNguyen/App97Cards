@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     android:backgroundTint="#FFFFFF"
     android:orientation="vertical"
     tools:context=".MainActivity">
@@ -86,7 +85,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/containerPilesCartes"
         android:layout_width="match_parent"
-        android:layout_height="275dp">
+        android:layout_height="275dp"
+        android:background="@drawable/unsplash_audrey_haimin">
 
         <LinearLayout
             android:id="@+id/pileDecroissante_2"
@@ -94,7 +94,7 @@
             android:layout_height="100dp"
             android:layout_marginEnd="60dp"
             android:layout_marginBottom="40dp"
-            android:background="#03A9F4"
+            android:background="@drawable/black_marquina"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -117,7 +117,7 @@
             android:layout_height="100dp"
             android:layout_marginStart="64dp"
             android:layout_marginBottom="28dp"
-            android:background="#03A9F4"
+            android:background="@drawable/black_marquina"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -140,7 +140,7 @@
             android:layout_height="100dp"
             android:layout_marginStart="64dp"
             android:layout_marginTop="12dp"
-            android:background="#03A9F4"
+            android:background="@drawable/black_marquina"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -161,7 +161,7 @@
             android:layout_height="100dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="60dp"
-            android:background="#03A9F4"
+            android:background="@drawable/black_marquina"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -180,13 +180,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/containerCartesJoueur"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/unsplash_freetousesoundscom">
 
         <LinearLayout
             android:id="@+id/carte1"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/carte2"
             app:layout_constraintHorizontal_bias="0.5"
@@ -207,7 +208,7 @@
             android:id="@+id/carte2"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/carte3"
             app:layout_constraintHorizontal_bias="0.5"
@@ -228,7 +229,7 @@
             android:id="@+id/carte3"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@+id/carte4"
             app:layout_constraintHorizontal_bias="0.5"
@@ -249,7 +250,7 @@
             android:id="@+id/carte4"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -270,7 +271,7 @@
             android:id="@+id/carte5"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/carte6"
@@ -291,7 +292,7 @@
             android:id="@+id/carte6"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/carte7"
@@ -312,7 +313,7 @@
             android:id="@+id/carte7"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/carte8"
@@ -333,7 +334,7 @@
             android:id="@+id/carte8"
             android:layout_width="60dp"
             android:layout_height="100dp"
-            android:background="#CC8FF8"
+            android:background="@drawable/unsplash_pawel_czerwinski"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

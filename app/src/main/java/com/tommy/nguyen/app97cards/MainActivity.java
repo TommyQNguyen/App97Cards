@@ -2,7 +2,6 @@ package com.tommy.nguyen.app97cards;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,11 +12,6 @@ import android.view.View;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         partie = new Partie();
 
         // Etape 2
+        // Je voulais faire les assigner a tous les enfants,
+        // mais j'ai realise que ca ne marche pas avec un ConstraintLayout
         pileCroissante_1.setOnDragListener(ec);
         pileCroissante_2.setOnDragListener(ec);
         pileDecroissante_1.setOnDragListener(ec);
@@ -108,10 +104,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onDrag(View source, DragEvent event) {
             switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_ENTERED:
-                    break;
-                case DragEvent.ACTION_DRAG_EXITED:
-                    break;
                 case DragEvent.ACTION_DROP:
                     // Pour mettre en contexte:
                     // Suggestion d'Eric que chaque pile aie son propre conteneur mais
@@ -202,15 +194,12 @@ public class MainActivity extends AppCompatActivity {
                     partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_1);
                     partie.extraireValeurPileDecroissante(MainActivity.this, pileDecroissante_2);
 
-                    partie.setFinDeLaPartie(partie.validerMouvementPossible());
+                    partie.setFinDeLaPartie(partie.validerMouvementImpossible());
                     if (partie.isFinDeLaPartie() == true) {
                         intent = new Intent(MainActivity.this, Conclusion.class);
                         intent.putExtra("points", Integer.toString(partie.getNombreDePoints()));
                         startActivity(intent);
                     }
-                    break;
-
-                case DragEvent.ACTION_DRAG_ENDED:
                     break;
                 default:
                     break;

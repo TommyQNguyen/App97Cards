@@ -3,13 +3,11 @@ package com.tommy.nguyen.app97cards;
 import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Partie {
-
     private final int BASE_POINTS = 100;
     private int nombreDeCartes = 97, nombreDePoints = 0;
     private boolean mouvementLegal = false, finDeLaPartie = false;
@@ -62,7 +60,7 @@ public class Partie {
     }
 
     // Vide les listes de cartes pour analyser
-    // l'etat de la partie.
+    // l'etat de la partie a chaque nouveau tour.
     public void viderListesDeCartes() {
         listeCartesJoueur.clear();
         listeCartesCroissantes.clear();
@@ -92,9 +90,9 @@ public class Partie {
         listeCartesDecroissantes.add(Integer.parseInt(valeurCarte));
     }
 
-    // Analyser les cartes du joueur pour voir si un autre mouvement est possible.
-    // Retourne faux ce n'est pas impossible de faire un autre mouvement.
-    public boolean validerMouvementPossible() {
+    // Analyser les cartes du joueur pour voir s'il peut continuer la partie.
+    // Retourne vrai si c'est impossible de faire un autre mouvement.
+    public boolean validerMouvementImpossible() {
         boolean mouvementPossiblePileCroissante = false, mouvementPossiblePileDecroissante = false;
         for (int i = 0; i < listeCartesJoueur.size(); i++) {
             for (int j = 0; j < listeCartesCroissantes.size(); j++)
