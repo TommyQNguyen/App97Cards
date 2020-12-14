@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
     Intent intent;
     Partie partie;
     Ecouteur ec;
+
+    // On entrepose la valeur du temps de depart depuis le debut de l'application
+    final long START_TIME = SystemClock.elapsedRealtime();
+    long lastTimeChecked = START_TIME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +92,15 @@ public class MainActivity extends AppCompatActivity {
         partie.placerCarteAleatoire(carte6);
         partie.placerCarteAleatoire(carte7);
         partie.placerCarteAleatoire(carte8);
+
+        Toast toast = Toast.makeText(this, "Bonne chance!", Toast.LENGTH_SHORT);
+        toast.show();
+
+        // On commence le chronometre des le debut du jeu
+        // pour empecher les utilisateurs de penser et faire
+        // leurs mouvements au moment du drag et faire plus de points
+        chronometre.setBase(START_TIME);
+        chronometre.start();
     }
 
     // Etape 3
@@ -163,19 +177,20 @@ public class MainActivity extends AppCompatActivity {
                         // par l'utilisateur
                         conteneurPileChoisie.addView(carteJoueurPige);
 
-                        // Ici, on arrete temporairement le temps pour
-                        // recueillir les millisecondes annulees
-                        chronometre.stop();
-                        int millisecondesEcoulees = (int) (SystemClock.elapsedRealtime() - chronometre.getBase());
-                        chronometre.setBase(SystemClock.elapsedRealtime());
-                        chronometre.start();
+                        // Enregistre le nombre de temps que ca prend a
+                        // l'utilisateur pour faire un tour
+                        long now = SystemClock.elapsedRealtime();
 
-                        System.out.println("SystemClock.elapsedRealtime(): " + SystemClock.elapsedRealtime());
-                        System.out.println("chronometre.getBase(): " + chronometre.getBase());
+                        // Calcul pour avoir le temps que ca a pris pour
+                        // prendre et deposer la carte.
+                        int millisecondesEcoulees = (int) (now - lastTimeChecked);
 
-                        partie.calculerPoints(millisecondesEcoulees, pointsProximite);
+                        // On commence la nouvelle intervalle de temps pour calculer
+                        // le prochain mouvement que ca prendra au joueur pour son prochain tour
+                        lastTimeChecked = now;
 
                         // Affichage du nouveau pointage
+                        partie.calculerPoints(millisecondesEcoulees, pointsProximite);
                         pointage.setText(String.valueOf(partie.getNombreDePoints()));
                     }
                     nombreDeCartes.setText(String.valueOf(partie.getNombreDeCartes()));
